@@ -112,6 +112,30 @@ test('deleting a blog is possible', async () => {
 
 })
 
+test('updating a blog is possible', async () => {
+    const blogAtStart = await helper.blogsInDb()
+    const blogToUpdate = blogAtStart[0]
+    const updateToBlog = {
+        title: 'BlogBois: we out here',
+        author: 'JB BlogBoi',
+        url: 'wwww.blogafella.edu',
+        likes: 40,
+    }
+
+    console.log(blogToUpdate.id)
+
+    await api
+        .put(`/api/blogs/${blogToUpdate.id}`)
+        .send(updateToBlog)
+        .expect(200)
+
+    const blogsAtEnd = await helper.blogsInDb()
+    const updatedBlog = blogsAtEnd[0]
+    console.log(updatedBlog)
+    assert.strictEqual(updatedBlog.title, updateToBlog.title)
+    assert.strictEqual(updatedBlog.likes, updateToBlog.likes)
+})
+
 after(async () => {
     await mongoose.connection.close()
 })
