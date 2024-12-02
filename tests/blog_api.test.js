@@ -24,6 +24,12 @@ test('blogs are returned as json', async () => {
         .expect('Content-Type', /application\/json/)
 })
 
+test('unique identifier is "id" and not "_id" ', async () => {
+    const response = await api.get('/api/blogs')
+    console.log(response._body[0])
+    assert(Object.hasOwn(response.body[0], 'id'))
+})
+
 after(async () => {
     await mongoose.connection.close()
 })
