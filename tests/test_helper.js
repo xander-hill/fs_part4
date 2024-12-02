@@ -11,7 +11,7 @@ const initialBlogs = [
         title: 'Bing Bop Blame',
         author: 'Jim',
         url: 'www.jokeurl.com',
-        likes: 12
+        likes: 12,
     },
 ]
 

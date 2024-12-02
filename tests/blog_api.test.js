@@ -50,6 +50,24 @@ test('posting a blog works', async () => {
     assert(titles.includes('Awooga'))
 })
 
+test('missing likes property defaults to zero', async () => {
+    const missingLikes = {
+        title: 'Who',
+        author: 'What',
+        url: 'Where',
+    }
+
+    await api
+        .post('/api/blogs')
+        .send(missingLikes)
+        .expect(201)
+        .expect('Content-Type', /application\/json/)
+
+    const blogsAtEnd = await helper.blogsInDb()
+    console.log(blogsAtEnd[2])
+    assert.strictEqual(blogsAtEnd[2].likes, 0)
+})
+
 after(async () => {
     await mongoose.connection.close()
 })
