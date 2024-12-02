@@ -68,6 +68,33 @@ test('missing likes property defaults to zero', async () => {
     assert.strictEqual(blogsAtEnd[2].likes, 0)
 })
 
+test('posting missing title and url property result in bad request', async () => {
+    const missingTitle = {
+        url: 'aaa',
+        author: 'joe',
+        likes: 4,
+    }
+
+    const missingUrl = {
+        title: 'q',
+        author: 'g',
+        likes: 6,
+    }
+
+    await api
+        .post('/api/blogs')
+        .send(missingTitle)
+        .expect(400)
+    
+    await api
+        .post('/api/blogs')
+        .send(missingUrl)
+        .expect(400)
+
+    const blogsAtEnd = await helper.blogsInDb()
+    assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length)
+})
+
 after(async () => {
     await mongoose.connection.close()
 })
