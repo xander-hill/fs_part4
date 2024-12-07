@@ -63,6 +63,47 @@ describe('when there is initially one user in db', () => {
   
       assert.strictEqual(usersAtEnd.length, usersAtStart.length)
     })
+
+    test('failure with a username less than 3 chars', async () => {
+        const usersAtStart = await helper.usersInDb()
+    
+        const newUser = {
+          username: 'db',
+          name: 'Matti Luukkainen',
+          password: 'salainen',
+        }
+    
+        await api
+          .post('/api/users')
+          .send(newUser)
+          .expect(400)
+    
+        const usersAtEnd = await helper.usersInDb()
+        assert.strictEqual(usersAtEnd.length, usersAtStart.length)
+    
+        const usernames = usersAtEnd.map(u => u.username)
+        assert(!usernames.includes(newUser.username))
+    })
+
+    test('failure with a password less than 3 chars', async () => {
+        const usersAtStart = await helper.usersInDb()
+    
+        const newUser = {
+          username: 'dbone',
+          name: 'Matti Luukkainen',
+          password: 'ja',
+        }
+    
+        const result = await api
+          .post('/api/users')
+          .send(newUser)
+          .expect(401)
+    
+        const usersAtEnd = await helper.usersInDb()
+        assert.strictEqual(usersAtEnd.length, usersAtStart.length)
+    
+        assert(result.body.error.includes('passsword of 3 characters required'))
+    })
 })
   
 after(async () => {
