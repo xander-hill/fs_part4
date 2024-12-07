@@ -6,6 +6,8 @@ const supertest = require('supertest')
 const Blog = require('../models/blog')
 const assert = require('node:assert')
 const api = supertest(app)
+const bcrypt = require('bcrypt')
+const User = require('../models/user')
 
 beforeEach(async () => {
     await Blog.deleteMany({})
