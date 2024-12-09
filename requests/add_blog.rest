@@ -1,10 +1,10 @@
 POST http://localhost:3003/api/blogs
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImJyZWFraW5nYmFkIiwiaWQiOiI2NzU0ZThjNDhkMzk3MTNjNjBkNDFkNzUiLCJpYXQiOjE3MzM2MTg1NzcsImV4cCI6MTczMzYyMjE3N30.Xc2emVRpQS2uFaXaiaQXDv6Gp0eSi8eym2q4OsUbpCk
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImJyZWFraW5nYmFkIiwiaWQiOiI2NzU0ZThjNDhkMzk3MTNjNjBkNDFkNzUiLCJpYXQiOjE3MzM3MDI1ODAsImV4cCI6MTczMzcwNjE4MH0.QK_VFltzpkzFZ9mH67vJZ3tuLxiHqWXlkkOD1mUugNw
 
 {
-    "title": "making meth",
-    "author": "walter and jesse",
-    "url": "www.onewhoknocks.com",
+    "title": "f u skylar",
+    "author": "walthuh",
+    "url": "www.tighttighttight.com",
     "likes": 2
 }
