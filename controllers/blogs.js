@@ -9,21 +9,17 @@ blogsRouter.get('/', async (request, response) => {
     response.json(blogs)
 })
   
-blogsRouter.post('/', async (request, response) => {
+blogsRouter.post('/', middleware.userExtractor, async (request, response) => {
     const body = request.body
-    const decodedToken = jwt.verify(request.token, process.env.SECRET)
-    if(!decodedToken.id) {
-      return response.status(401).json({ error: 'token invalid' })
-    }
 
-    const user = await User.findById(decodedToken.id)
+    const user = request.user
 
     const blog = new Blog({
       title: body.title,
       author: body.author,
       url: body.url,
       likes: body.likes || 0,
-      user: user._id,
+      user: user.id,
     })
 
     const savedBlog = await blog.save()
@@ -43,15 +39,10 @@ blogsRouter.get('/:id', async (request, response) => {
   }
 })
 
-blogsRouter.delete('/:id', async (request,response) => {
+blogsRouter.delete('/:id', middleware.userExtractor, async (request,response) => {
   const blog = await Blog.findById(request.params.id)
-  const decodedToken = jwt.verify(request.token, process.env.SECRET)
-  if(!decodedToken.id) {
-    return response.status(401).json({ error: 'token invalid' })
-  }
-  console.log(decodedToken)
-  const userid = decodedToken.id
-  console.log(userid)
+  console.log(request.paramsuser)
+  const userid = request.user.id
   if ( blog.user.toString() === userid.toString() ) {
     await Blog.findByIdAndDelete(request.params.id)
     response.status(204).end()
