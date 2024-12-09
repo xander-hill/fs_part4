@@ -8,15 +8,34 @@ const assert = require('node:assert')
 const api = supertest(app)
 const bcrypt = require('bcrypt')
 const User = require('../models/user')
+const jwt = require('jsonwebtoken')
 
 beforeEach(async () => {
-    await Blog.deleteMany({})
+    await Blog.deleteMany({});
+    await User.deleteMany({});
 
+    // Add initial blogs to the database
     for (let blog of helper.initialBlogs) {
-        let blogObject = new Blog(blog)
-        await blogObject.save()
+        let blogObject = new Blog(blog);
+        await blogObject.save();
     }
-})
+
+    // Create a user for generating the token
+    const user = new User({
+        username: 'testUser',
+        name: 'Test User',
+        passwordHash: 'hashedpassword', // Replace with actual hashed password
+    });
+    await user.save();
+
+    // Generate a token for the user
+    const userForToken = {
+        username: user.username,
+        id: user.id,
+    };
+    token = jwt.sign(userForToken, process.env.SECRET);
+    console.log(token)
+});
 
 test('blogs are returned as json', async () => {
     console.log('entered test')
@@ -41,6 +60,7 @@ test('posting a blog works', async () => {
 
     await api
         .post('/api/blogs')
+        .set('Authorization', `Bearer ${token}`)
         .send(newBlog)
         .expect(201)
         .expect('Content-Type', /application\/json/)
@@ -61,6 +81,7 @@ test('missing likes property defaults to zero', async () => {
 
     await api
         .post('/api/blogs')
+        .set('Authorization', `Bearer ${token}`)
         .send(missingLikes)
         .expect(201)
         .expect('Content-Type', /application\/json/)
@@ -85,16 +106,39 @@ test('posting missing title and url property result in bad request', async () =>
 
     await api
         .post('/api/blogs')
+        .set('Authorization', `Bearer ${token}`)
         .send(missingTitle)
         .expect(400)
     
     await api
         .post('/api/blogs')
+        .set('Authorization', `Bearer ${token}`)
         .send(missingUrl)
         .expect(400)
 
     const blogsAtEnd = await helper.blogsInDb()
     assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length)
+})
+
+test('no token provided results in 401', async () => {
+    const newBlog = {
+        title: 'Awooga',
+        author: 'BingBong',
+        url: 'www.boop.net',
+        likes: 4000000,
+    }
+
+    await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .expect(401)
+        .expect('Content-Type', /application\/json/)
+
+    const blogsAtEnd = await helper.blogsInDb()
+    assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length)
+
+    const titles = blogsAtEnd.map(blog => blog.title)
+    assert(!titles.includes('Awooga'))
 })
 
 test('deleting a blog is possible', async () => {
