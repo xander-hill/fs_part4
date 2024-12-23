@@ -40,12 +40,20 @@ blogsRouter.get('/:id', async (request, response) => {
 })
 
 blogsRouter.delete('/:id', middleware.userExtractor, async (request,response) => {
-  const blog = await Blog.findById(request.params.id)
-  console.log(request.paramsuser)
+  const blog = await Blog.findById(request.params)
+
+  if (!blog) {
+    console.log(`Blog with ID ${request.params.id} not found`);
+    return response.status(404).json({ error: 'Blog not found' });
+  }
+
+  console.log(request.params.user)
+  console.log(blog.user)
   const userid = request.user.id
+  console.log(userid.toString())
   if ( blog.user.toString() === userid.toString() ) {
     await Blog.findByIdAndDelete(request.params.id)
-    response.status(204).end()
+    return response.status(204).end()
   }
 
   response.status(401).end()
