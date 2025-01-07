@@ -33,22 +33,23 @@ blogsRouter.post('/', middleware.userExtractor, async (request, response) => {
 })
 
 blogsRouter.post('/:id/comments', async (request, response) => {
+  console.log('Request body', request.body)
+  const blog = await Blog.findById(request.params.id)
+
   if (!blog) {
     response.status(404).end()
   } 
-  const body = request.body
-  const blog = await Blog.findById(request.params.id)
+  const { content } = request.body
+  console.log('Content', content)
 
-  const comment = new Comment({
-    comment: body.content,
-  })
+  if (!content) {
+    return response.status(400).json({ error: 'Comment content is required' })
+  }
 
-  const savedComment = comment.save()
+  blog.comments = blog.comments.concat(content)
+  updatedBlog = await blog.save()
 
-  blog.comments = blog.comments.concat(savedComment)
-  await blog.save()
-
-  response.status(201).json(savedComment)
+  response.status(201).json(updatedBlog)
 
 })
 
